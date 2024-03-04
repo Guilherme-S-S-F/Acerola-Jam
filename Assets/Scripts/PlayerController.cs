@@ -2,10 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
- 
+using UnityEngine.InputSystem;
+
 [RequireComponent(typeof(CharacterController))]
 public class FPSController : MonoBehaviour
 {
+    PlayerInput playerInput;
+    InputAction moveAction;
+    InputAction lookAction;
+    InputAction flashlightAction;
+    InputAction runAction;
+
     [Category("Movement")]
     [SerializeField] Camera playerCamera;
     [SerializeField] GameObject hand;
@@ -38,6 +45,13 @@ public class FPSController : MonoBehaviour
     CharacterController characterController;
     void Start()
     {
+        // Inputs.
+        playerInput = GetComponent<PlayerInput>();
+        moveAction = playerInput.actions.FindAction("movement");
+        lookAction = playerInput.actions.FindAction("Look");
+        flashlightAction = playerInput.actions.FindAction("toggleFlashlight");
+        runAction = playerInput.actions.FindAction("run");
+
         characterController = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -54,7 +68,7 @@ public class FPSController : MonoBehaviour
     }
 
     void toggleFlashlight() {
-        flashlightOn = Input.GetButtonDown("Fire1") ? !flashlightOn : flashlightOn;
+        flashlightOn = flashlightAction.IsPressed() ? !flashlightOn : flashlightOn;
 
        flashlight.GetComponentInChildren<Light>().enabled = flashlightOn;
     }
@@ -92,9 +106,9 @@ public class FPSController : MonoBehaviour
         Vector3 right = transform.TransformDirection(Vector3.right);
  
         // Press Left Shift to run
-        isRunning = Input.GetKey(KeyCode.LeftShift);
-        float curSpeedX = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Horizontal") : 0;
+        isRunning = runAction.IsPressed();
+        float curSpeedX = canMove ? (isRunning ? runSpeed : walkSpeed) * moveAction.ReadValue<Vector2>().y : 0;
+        float curSpeedY = canMove ? (isRunning ? runSpeed : walkSpeed) * moveAction.ReadValue<Vector2>().x : 0;
         float movementDirectionY = moveDirection.y;
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
  
@@ -115,11 +129,11 @@ public class FPSController : MonoBehaviour
  
         if (canMove)
         {
-            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+            rotationX += -lookAction.ReadValue<Vector2>().y * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             hand.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+            transform.rotation *= Quaternion.Euler(0, lookAction.ReadValue<Vector2>().x * lookSpeed, 0);
         }
  
         #endregion

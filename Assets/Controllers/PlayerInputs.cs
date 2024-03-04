@@ -29,19 +29,57 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             ""actions"": [
                 {
                     ""name"": ""movement"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""44e937df-5463-40b4-bc81-70d18569d33c"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""toggleFlashlight"",
+                    ""type"": ""Button"",
+                    ""id"": ""fbb186f3-6d5e-4271-a031-33d8046e35e5"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""run"",
+                    ""type"": ""Button"",
+                    ""id"": ""480b1a83-9b36-4627-a642-207faa20803c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""559bcb0a-51e6-40e2-ac62-a0c8e7fae240"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
                 {
-                    ""name"": ""vertical"",
-                    ""id"": ""fc825335-d565-4554-a526-766e1c4491d1"",
-                    ""path"": ""1DAxis"",
+                    ""name"": """",
+                    ""id"": ""2435d8fe-5916-4395-b090-ea20579adea6"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""toggleFlashlight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""WASD"",
+                    ""id"": ""fd561ae1-4efe-4354-a3fe-b2f22db10e70"",
+                    ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -50,8 +88,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""negative"",
-                    ""id"": ""7d6cbb28-9745-4b12-9cc5-b807c83a9ec0"",
+                    ""name"": ""up"",
+                    ""id"": ""8533d94a-e73c-4c6b-b97a-370ce863bf20"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -61,8 +99,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""positive"",
-                    ""id"": ""954ca36d-6720-4e08-aece-8dfe284bed90"",
+                    ""name"": ""down"",
+                    ""id"": ""10b7b7bb-5bb4-48eb-9184-7894e5559166"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -72,19 +110,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""horizontal"",
-                    ""id"": ""3d1f07dc-b7ee-44fa-806a-0338549dba69"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""movement"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""e6cd7dcb-3313-473a-b15c-45a360a75b7f"",
+                    ""name"": ""left"",
+                    ""id"": ""0f877784-0a6c-4462-b7e5-7b5dc8560780"",
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -94,8 +121,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""positive"",
-                    ""id"": ""eec31489-e27b-4580-8955-cc67d6884c66"",
+                    ""name"": ""right"",
+                    ""id"": ""75f17645-e26b-4263-89f5-59ac3b1f1073"",
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -103,6 +130,28 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""action"": ""movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c199665c-7c08-4f6c-8b54-b0a1298b9eb8"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a3ec6150-26d1-4114-b54e-b989666e78fd"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -112,6 +161,9 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         // player
         m_player = asset.FindActionMap("player", throwIfNotFound: true);
         m_player_movement = m_player.FindAction("movement", throwIfNotFound: true);
+        m_player_toggleFlashlight = m_player.FindAction("toggleFlashlight", throwIfNotFound: true);
+        m_player_run = m_player.FindAction("run", throwIfNotFound: true);
+        m_player_Look = m_player.FindAction("Look", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -174,11 +226,17 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_player;
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_player_movement;
+    private readonly InputAction m_player_toggleFlashlight;
+    private readonly InputAction m_player_run;
+    private readonly InputAction m_player_Look;
     public struct PlayerActions
     {
         private @PlayerInputs m_Wrapper;
         public PlayerActions(@PlayerInputs wrapper) { m_Wrapper = wrapper; }
         public InputAction @movement => m_Wrapper.m_player_movement;
+        public InputAction @toggleFlashlight => m_Wrapper.m_player_toggleFlashlight;
+        public InputAction @run => m_Wrapper.m_player_run;
+        public InputAction @Look => m_Wrapper.m_player_Look;
         public InputActionMap Get() { return m_Wrapper.m_player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -191,6 +249,15 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @movement.started += instance.OnMovement;
             @movement.performed += instance.OnMovement;
             @movement.canceled += instance.OnMovement;
+            @toggleFlashlight.started += instance.OnToggleFlashlight;
+            @toggleFlashlight.performed += instance.OnToggleFlashlight;
+            @toggleFlashlight.canceled += instance.OnToggleFlashlight;
+            @run.started += instance.OnRun;
+            @run.performed += instance.OnRun;
+            @run.canceled += instance.OnRun;
+            @Look.started += instance.OnLook;
+            @Look.performed += instance.OnLook;
+            @Look.canceled += instance.OnLook;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -198,6 +265,15 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @movement.started -= instance.OnMovement;
             @movement.performed -= instance.OnMovement;
             @movement.canceled -= instance.OnMovement;
+            @toggleFlashlight.started -= instance.OnToggleFlashlight;
+            @toggleFlashlight.performed -= instance.OnToggleFlashlight;
+            @toggleFlashlight.canceled -= instance.OnToggleFlashlight;
+            @run.started -= instance.OnRun;
+            @run.performed -= instance.OnRun;
+            @run.canceled -= instance.OnRun;
+            @Look.started -= instance.OnLook;
+            @Look.performed -= instance.OnLook;
+            @Look.canceled -= instance.OnLook;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -218,5 +294,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
     public interface IPlayerActions
     {
         void OnMovement(InputAction.CallbackContext context);
+        void OnToggleFlashlight(InputAction.CallbackContext context);
+        void OnRun(InputAction.CallbackContext context);
+        void OnLook(InputAction.CallbackContext context);
     }
 }

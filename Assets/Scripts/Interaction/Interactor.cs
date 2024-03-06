@@ -19,6 +19,7 @@ public class Interactor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        playerInput = GetComponent<PlayerInput>();
         interactAction = playerInput.actions.FindAction("interact");
     }
 
@@ -32,6 +33,7 @@ public class Interactor : MonoBehaviour
             {
                 if(hitInfo.collider.gameObject.TryGetComponent(out IInteractable interactObj))
                 {
+                    Debug.Log("collided");
                     interactObj.Interact();
                 }
             }

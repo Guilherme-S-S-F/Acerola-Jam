@@ -12,6 +12,7 @@ public class FPSController : MonoBehaviour
     InputAction lookAction;
     InputAction flashlightAction;
     InputAction runAction;
+    InputAction flashlightFocusAction;
 
     [Category("Movement")]
     [SerializeField] Camera playerCamera;
@@ -30,7 +31,9 @@ public class FPSController : MonoBehaviour
     bool isRunning = false;
 
     bool flashlightOn = false;
+    bool flashlightFocus = false;
     [SerializeField] GameObject flashlight;
+    [SerializeField] Light flashlightLight;
 
     [Category("Head Bobbing")]
     [SerializeField] float walkingBobbingSpeed = 6f;
@@ -40,16 +43,23 @@ public class FPSController : MonoBehaviour
     float defaultPosY = 0;
     float defaultHandPosX = 0;
     float timer = 0;
- 
+    float timerL = 0;
+
+    // Focus lantern
+
+    float innerSpotDefault = 30;
+    float spotAngleDefault = 90;
     
     CharacterController characterController;
     void Start()
     {
         // Inputs.
+        flashlightLight = flashlight.GetComponentInChildren<Light>();
         playerInput = GetComponent<PlayerInput>();
         moveAction = playerInput.actions.FindAction("movement");
         lookAction = playerInput.actions.FindAction("Look");
         flashlightAction = playerInput.actions.FindAction("toggleFlashlight");
+        flashlightFocusAction = playerInput.actions.FindAction("focusFlashlight");
         runAction = playerInput.actions.FindAction("run");
 
         characterController = GetComponent<CharacterController>();
@@ -64,6 +74,7 @@ public class FPSController : MonoBehaviour
     {
         movement();
         toggleFlashlight();
+        toggleflashlightFocus();
         headBobbing();
     }
 
@@ -71,6 +82,33 @@ public class FPSController : MonoBehaviour
         flashlightOn = flashlightAction.IsPressed() ? !flashlightOn : flashlightOn;
 
        flashlight.GetComponentInChildren<Light>().enabled = flashlightOn;
+    }
+    void toggleflashlightFocus()
+    {
+
+
+        if (flashlightFocusAction.IsPressed())
+        {
+            flashlightLight.intensity = 8;
+            flashlightLight.range = 20;
+            flashlightLight.innerSpotAngle += (float)(Mathf.Sin(timerL) * 10f);
+            flashlightLight.spotAngle -= (float)(Mathf.Sin(timerL) * 10f);
+            playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, 60, Time.deltaTime * 5f);
+            flashlightFocus = true;
+            timerL += Time.deltaTime;
+            timerL = Mathf.Clamp(timerL, 0, 3.1f);
+        }
+        else{
+            flashlightLight.intensity = 4;
+            flashlightLight.range = 16;
+            flashlightLight.innerSpotAngle = Mathf.Lerp(flashlightLight.innerSpotAngle, innerSpotDefault, Time.deltaTime * 10f);
+            flashlightLight.spotAngle = Mathf.Lerp(flashlightLight.spotAngle, spotAngleDefault, Time.deltaTime * 10f);
+            playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, 75,Time.deltaTime * 5f);
+            flashlightFocus = false;
+            timerL = 0;
+        }
+        flashlightLight.innerSpotAngle = Mathf.Clamp(flashlightLight.innerSpotAngle, 30, 50);
+        flashlightLight.spotAngle = Mathf.Clamp(flashlightLight.spotAngle, 50, 90);
     }
 
     void headBobbing()

@@ -62,6 +62,24 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""814a56eb-184e-4fa4-b78d-5c09e8441a74"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""focusFlashlight"",
+                    ""type"": ""Button"",
+                    ""id"": ""c561c7f7-516a-4f81-be8e-591cf7f96a30"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -152,6 +170,28 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0c3bc0a1-3378-463c-b75d-61bdf6def748"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b4f7f75d-cdb2-4414-b135-7c2550dc55a1"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""focusFlashlight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -164,6 +204,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         m_player_toggleFlashlight = m_player.FindAction("toggleFlashlight", throwIfNotFound: true);
         m_player_run = m_player.FindAction("run", throwIfNotFound: true);
         m_player_Look = m_player.FindAction("Look", throwIfNotFound: true);
+        m_player_interact = m_player.FindAction("interact", throwIfNotFound: true);
+        m_player_focusFlashlight = m_player.FindAction("focusFlashlight", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -229,6 +271,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
     private readonly InputAction m_player_toggleFlashlight;
     private readonly InputAction m_player_run;
     private readonly InputAction m_player_Look;
+    private readonly InputAction m_player_interact;
+    private readonly InputAction m_player_focusFlashlight;
     public struct PlayerActions
     {
         private @PlayerInputs m_Wrapper;
@@ -237,6 +281,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         public InputAction @toggleFlashlight => m_Wrapper.m_player_toggleFlashlight;
         public InputAction @run => m_Wrapper.m_player_run;
         public InputAction @Look => m_Wrapper.m_player_Look;
+        public InputAction @interact => m_Wrapper.m_player_interact;
+        public InputAction @focusFlashlight => m_Wrapper.m_player_focusFlashlight;
         public InputActionMap Get() { return m_Wrapper.m_player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -258,6 +304,12 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @interact.started += instance.OnInteract;
+            @interact.performed += instance.OnInteract;
+            @interact.canceled += instance.OnInteract;
+            @focusFlashlight.started += instance.OnFocusFlashlight;
+            @focusFlashlight.performed += instance.OnFocusFlashlight;
+            @focusFlashlight.canceled += instance.OnFocusFlashlight;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -274,6 +326,12 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @interact.started -= instance.OnInteract;
+            @interact.performed -= instance.OnInteract;
+            @interact.canceled -= instance.OnInteract;
+            @focusFlashlight.started -= instance.OnFocusFlashlight;
+            @focusFlashlight.performed -= instance.OnFocusFlashlight;
+            @focusFlashlight.canceled -= instance.OnFocusFlashlight;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -297,5 +355,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         void OnToggleFlashlight(InputAction.CallbackContext context);
         void OnRun(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
+        void OnFocusFlashlight(InputAction.CallbackContext context);
     }
 }

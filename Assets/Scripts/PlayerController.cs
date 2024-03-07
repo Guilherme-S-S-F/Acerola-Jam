@@ -46,6 +46,12 @@ public class FPSController : MonoBehaviour
     float timerL = 0;
 
     // Focus lantern
+    [Category("Lantern Focus")]
+    public float focusTimeLimit = 8f;
+    public float focusTimerMultiplier = 1f;
+    float focusTime = 0f;
+    float focusCoolDownTime = 3f;
+    bool focusCoolDown = false;
 
     float innerSpotDefault = 30;
     float spotAngleDefault = 90;
@@ -85,30 +91,44 @@ public class FPSController : MonoBehaviour
     }
     void toggleflashlightFocus()
     {
+        float delta = Time.deltaTime;
 
+        if(focusTime <= 0)
+        {
+            focusCoolDown = true;
+        }
 
-        if (flashlightFocusAction.IsPressed())
+        if(!(focusCoolDown && focusTime < focusCoolDownTime))
+        {
+            focusCoolDown = false;
+        }
+
+        if (flashlightFocusAction.IsPressed() && !focusCoolDown )
         {
             flashlightLight.intensity = 8;
             flashlightLight.range = 20;
             flashlightLight.innerSpotAngle += (float)(Mathf.Sin(timerL) * 10f);
             flashlightLight.spotAngle -= (float)(Mathf.Sin(timerL) * 10f);
-            playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, 60, Time.deltaTime * 5f);
+            playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, 50, delta * 5f);
             flashlightFocus = true;
-            timerL += Time.deltaTime;
+            timerL += delta;
+            focusTime -= delta * focusTimerMultiplier;
             timerL = Mathf.Clamp(timerL, 0, 3.1f);
         }
         else{
             flashlightLight.intensity = 4;
             flashlightLight.range = 16;
-            flashlightLight.innerSpotAngle = Mathf.Lerp(flashlightLight.innerSpotAngle, innerSpotDefault, Time.deltaTime * 10f);
-            flashlightLight.spotAngle = Mathf.Lerp(flashlightLight.spotAngle, spotAngleDefault, Time.deltaTime * 10f);
-            playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, 75,Time.deltaTime * 5f);
+            flashlightLight.innerSpotAngle = Mathf.Lerp(flashlightLight.innerSpotAngle, innerSpotDefault, delta * 10f);
+            flashlightLight.spotAngle = Mathf.Lerp(flashlightLight.spotAngle, spotAngleDefault, delta * 10f);
+            playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, 75, delta * 5f);
             flashlightFocus = false;
             timerL = 0;
+            focusTime += delta * focusTimerMultiplier;
         }
-        flashlightLight.innerSpotAngle = Mathf.Clamp(flashlightLight.innerSpotAngle, 30, 50);
-        flashlightLight.spotAngle = Mathf.Clamp(flashlightLight.spotAngle, 50, 90);
+        flashlightLight.innerSpotAngle = Mathf.Clamp(flashlightLight.innerSpotAngle, 30, 40);
+        flashlightLight.spotAngle = Mathf.Clamp(flashlightLight.spotAngle, 40, 90);
+        focusTime = Mathf.Clamp(focusTime, 0, focusTimeLimit);
+        Debug.Log(focusTime);
     }
 
     void headBobbing()

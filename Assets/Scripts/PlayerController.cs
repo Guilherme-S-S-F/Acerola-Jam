@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using Jam.Events;
 
 [RequireComponent(typeof(CharacterController))]
 public class FPSController : MonoBehaviour
@@ -49,14 +51,17 @@ public class FPSController : MonoBehaviour
     [Category("Lantern Focus")]
     public float focusTimeLimit = 8f;
     public float focusTimerMultiplier = 1f;
-    float focusTime = 0f;
-    float focusCoolDownTime = 3f;
+    public float focusTimerMultiplierCooldown = 0.4f;
+    float focusBarAmmount;
+    float focusTime;
+    float focusCoolDownTime = 8f;
     bool focusCoolDown = false;
 
     float innerSpotDefault = 30;
     float spotAngleDefault = 90;
     
     CharacterController characterController;
+
     void Start()
     {
         // Inputs.
@@ -74,20 +79,28 @@ public class FPSController : MonoBehaviour
 
         defaultPosY = playerCamera.transform.localPosition.y;
         defaultHandPosX = hand.transform.localPosition.x;
+
+        focusTime = focusTimeLimit;
+
+
+        flashlightAction.performed += toggleFlashlight;
     }
  
     void Update()
     {
         movement();
-        toggleFlashlight();
         toggleflashlightFocus();
         headBobbing();
     }
 
-    void toggleFlashlight() {
-        flashlightOn = flashlightAction.IsPressed() ? !flashlightOn : flashlightOn;
+    void toggleFlashlight(InputAction.CallbackContext context) {
+        //flashlightOn = flashlightAction.IsPressed() ? !flashlightOn : flashlightOn;
+        if(context.performed)
+        {
+            flashlightOn = !flashlightOn;
+        }
 
-       flashlight.GetComponentInChildren<Light>().enabled = flashlightOn;
+        flashlight.GetComponentInChildren<Light>().enabled = flashlightOn;
     }
     void toggleflashlightFocus()
     {
@@ -103,7 +116,7 @@ public class FPSController : MonoBehaviour
             focusCoolDown = false;
         }
 
-        if (flashlightFocusAction.IsPressed() && !focusCoolDown )
+        if (flashlightFocusAction.IsPressed() && (!focusCoolDown && flashlightOn) )
         {
             flashlightLight.intensity = 8;
             flashlightLight.range = 20;
@@ -123,12 +136,14 @@ public class FPSController : MonoBehaviour
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, 75, delta * 5f);
             flashlightFocus = false;
             timerL = 0;
-            focusTime += delta * focusTimerMultiplier;
+            focusTime += delta * (focusCoolDown ? focusTimerMultiplierCooldown : focusTimerMultiplier);
+
         }
         flashlightLight.innerSpotAngle = Mathf.Clamp(flashlightLight.innerSpotAngle, 30, 40);
         flashlightLight.spotAngle = Mathf.Clamp(flashlightLight.spotAngle, 40, 90);
         focusTime = Mathf.Clamp(focusTime, 0, focusTimeLimit);
-        Debug.Log(focusTime);
+        focusBarAmmount = focusTime / focusTimeLimit;
+        StaminaChangeEvent.InvokeStaminaChange(focusBarAmmount, focusCoolDown);
     }
 
     void headBobbing()
@@ -165,8 +180,8 @@ public class FPSController : MonoBehaviour
  
         // Press Left Shift to run
         isRunning = runAction.IsPressed();
-        float curSpeedX = canMove ? (isRunning ? runSpeed : walkSpeed) * moveAction.ReadValue<Vector2>().y : 0;
-        float curSpeedY = canMove ? (isRunning ? runSpeed : walkSpeed) * moveAction.ReadValue<Vector2>().x : 0;
+        float curSpeedX = canMove ? (isRunning && !flashlightFocus ? runSpeed : walkSpeed) * moveAction.ReadValue<Vector2>().y : 0;
+        float curSpeedY = canMove ? (isRunning && !flashlightFocus ? runSpeed : walkSpeed) * moveAction.ReadValue<Vector2>().x : 0;
         float movementDirectionY = moveDirection.y;
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
  

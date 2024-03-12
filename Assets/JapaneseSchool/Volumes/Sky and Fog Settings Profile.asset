@@ -21,7 +21,7 @@ MonoBehaviour:
     m_Value: 0.9
   intensity:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 1.5
   scatter:
     m_OverrideState: 0
     m_Value: 0.7
@@ -540,6 +540,7 @@ MonoBehaviour:
   - {fileID: 3341199624854728458}
   - {fileID: 3714337709514932120}
   - {fileID: 5962192154817221680}
+  - {fileID: 5464754229003238395}
 --- !u!114 &1142777632297148762
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -702,14 +703,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   color:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {r: 0, g: 0, b: 0, a: 1}
   center:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {x: 0.5, y: 0.5}
   intensity:
     m_OverrideState: 1
-    m_Value: 0.25
+    m_Value: 0.381
   smoothness:
     m_OverrideState: 0
     m_Value: 0.2
@@ -728,10 +729,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180773991d8724ab7f2d216912b564, type: 3}
   m_Name: ChromaticAberration
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0.1
+    m_Value: 0
 --- !u!114 &4326379059101945776
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -832,6 +833,25 @@ MonoBehaviour:
     m_Value: 8
     min: 1
     max: 32
+--- !u!114 &5464754229003238395
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 221518ef91623a7438a71fef23660601, type: 3}
+  m_Name: WhiteBalance
+  m_EditorClassIdentifier: 
+  active: 1
+  temperature:
+    m_OverrideState: 1
+    m_Value: 84
+  tint:
+    m_OverrideState: 1
+    m_Value: 3
 --- !u!114 &5962192154817221680
 MonoBehaviour:
   m_ObjectHideFlags: 3

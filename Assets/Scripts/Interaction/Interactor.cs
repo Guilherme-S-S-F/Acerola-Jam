@@ -10,6 +10,8 @@ interface IInteractable
 }
 public class Interactor : MonoBehaviour
 {
+    public GameObject lbl_interact;
+
     public Transform interactorSource;
     public float interactRange;
 
@@ -21,14 +23,28 @@ public class Interactor : MonoBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         interactAction = playerInput.actions.FindAction("interact");
+        lbl_interact.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(interactAction.IsPressed())
+        Ray r = new Ray(interactorSource.position, interactorSource.forward);
+
+        if (Physics.Raycast(r, out RaycastHit hitInfo1, interactRange))
         {
-            Ray r = new Ray(interactorSource.position, interactorSource.forward);
+            if (hitInfo1.collider.gameObject.TryGetComponent(out IInteractable interactObj))
+            {
+                lbl_interact.SetActive(true);
+            }
+            else
+            {
+                lbl_interact.SetActive(false);
+            }
+        }
+
+        if (interactAction.IsPressed())
+        {
             if(Physics.Raycast(r, out RaycastHit hitInfo, interactRange))
             {
                 if(hitInfo.collider.gameObject.TryGetComponent(out IInteractable interactObj))

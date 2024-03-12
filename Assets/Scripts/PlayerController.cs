@@ -7,8 +7,9 @@ using UnityEngine.InputSystem;
 using Jam.Events;
 
 [RequireComponent(typeof(CharacterController))]
-public class FPSController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
+    public GameRules gameRules;
     PlayerInput playerInput;
     InputAction moveAction;
     InputAction lookAction;
@@ -16,15 +17,15 @@ public class FPSController : MonoBehaviour
     InputAction runAction;
     InputAction flashlightFocusAction;
 
-    [Category("Movement")]
+    [Header("Movement")]
     [SerializeField] Camera playerCamera;
     [SerializeField] GameObject hand;
     [SerializeField] float walkSpeed = 3f;
     [SerializeField] float runSpeed = 6f;
     [SerializeField] float gravity = 10f;
 
-    [SerializeField] float lookSpeed = 2f;
-    [SerializeField] float lookXLimit = 45f;
+    [SerializeField] public float lookSpeed = 1f;
+    [SerializeField] float lookXLimit = 80f;
     
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0;
@@ -32,12 +33,12 @@ public class FPSController : MonoBehaviour
     bool canMove = true;
     bool isRunning = false;
 
-    bool flashlightOn = false;
+    bool flashlightOn = true;
     bool flashlightFocus = false;
     [SerializeField] GameObject flashlight;
     [SerializeField] Light flashlightLight;
 
-    [Category("Head Bobbing")]
+    [Header("Head Bobbing")]
     [SerializeField] float walkingBobbingSpeed = 6f;
     [SerializeField] float runningBobbingSpeed = 10f;
     [SerializeField] float bobbingAmount = 0.05f;
@@ -48,7 +49,7 @@ public class FPSController : MonoBehaviour
     float timerL = 0;
 
     // Focus lantern
-    [Category("Lantern Focus")]
+    [Header("Lantern Focus")]
     public float focusTimeLimit = 8f;
     public float focusTimerMultiplier = 1f;
     public float focusTimerMultiplierCooldown = 0.4f;
@@ -62,11 +63,17 @@ public class FPSController : MonoBehaviour
     
     CharacterController characterController;
 
+    [Header("Enemy Interaction")]
+    public LayerMask isEnemy;
+
+
     void Start()
     {
         // Inputs.
         flashlightLight = flashlight.GetComponentInChildren<Light>();
+
         playerInput = GetComponent<PlayerInput>();
+
         moveAction = playerInput.actions.FindAction("movement");
         lookAction = playerInput.actions.FindAction("Look");
         flashlightAction = playerInput.actions.FindAction("toggleFlashlight");
@@ -74,33 +81,58 @@ public class FPSController : MonoBehaviour
         runAction = playerInput.actions.FindAction("run");
 
         characterController = GetComponent<CharacterController>();
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
 
         defaultPosY = playerCamera.transform.localPosition.y;
         defaultHandPosX = hand.transform.localPosition.x;
 
         focusTime = focusTimeLimit;
 
-
         flashlightAction.performed += toggleFlashlight;
+        EnemyAttackEvent.EnemyAttack += setAttacked;
     }
  
     void Update()
     {
-        movement();
-        toggleflashlightFocus();
-        headBobbing();
+        if (!gameRules.isPause)
+        {
+            if (canMove)
+            {
+                movement();
+                toggleflashlightFocus();
+                headBobbing();
+            }
+        }
+    }
+
+    void setAttacked(Transform enemy)
+    {
+        this.transform.LookAt(enemy);
+        canMove = false;
     }
 
     void toggleFlashlight(InputAction.CallbackContext context) {
         //flashlightOn = flashlightAction.IsPressed() ? !flashlightOn : flashlightOn;
+        if (gameRules.isPause)
+            return;
         if(context.performed)
         {
             flashlightOn = !flashlightOn;
         }
 
         flashlight.GetComponentInChildren<Light>().enabled = flashlightOn;
+    }
+
+    void focusEnemy()
+    {
+        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+        if(Physics.Raycast(ray, 15f, isEnemy))
+        {
+            EnemyFocusEvent.InvokeEnemyFocus(Time.deltaTime);
+        }
+        else
+        {
+            EnemyFocusEvent.InvokeEnemyExitFocus();
+        }
     }
     void toggleflashlightFocus()
     {
@@ -122,22 +154,25 @@ public class FPSController : MonoBehaviour
             flashlightLight.range = 20;
             flashlightLight.innerSpotAngle += (float)(Mathf.Sin(timerL) * 10f);
             flashlightLight.spotAngle -= (float)(Mathf.Sin(timerL) * 10f);
+
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, 50, delta * 5f);
             flashlightFocus = true;
             timerL += delta;
             focusTime -= delta * focusTimerMultiplier;
             timerL = Mathf.Clamp(timerL, 0, 3.1f);
+            focusEnemy();
         }
         else{
             flashlightLight.intensity = 4;
             flashlightLight.range = 16;
             flashlightLight.innerSpotAngle = Mathf.Lerp(flashlightLight.innerSpotAngle, innerSpotDefault, delta * 10f);
             flashlightLight.spotAngle = Mathf.Lerp(flashlightLight.spotAngle, spotAngleDefault, delta * 10f);
+
             playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, 75, delta * 5f);
             flashlightFocus = false;
             timerL = 0;
             focusTime += delta * (focusCoolDown ? focusTimerMultiplierCooldown : focusTimerMultiplier);
-
+            EnemyFocusEvent.InvokeEnemyExitFocus();
         }
         flashlightLight.innerSpotAngle = Mathf.Clamp(flashlightLight.innerSpotAngle, 30, 40);
         flashlightLight.spotAngle = Mathf.Clamp(flashlightLight.spotAngle, 40, 90);
@@ -158,7 +193,6 @@ public class FPSController : MonoBehaviour
 
             hand.transform.localPosition = new Vector3(defaultHandPosX + Mathf.Sin(timer) *
                 bobbingAmount, hand.transform.localPosition.y, hand.transform.localPosition.z);
-
         }
         else
         {
@@ -208,7 +242,8 @@ public class FPSController : MonoBehaviour
             hand.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, lookAction.ReadValue<Vector2>().x * lookSpeed, 0);
         }
- 
+
         #endregion
+        PlayerSoundEvent.InvokeFootStepEvent(Mathf.Abs(curSpeedX) + Mathf.Abs(curSpeedY), isRunning);
     }
 }

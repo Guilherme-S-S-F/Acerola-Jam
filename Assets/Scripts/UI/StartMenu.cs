@@ -106,7 +106,7 @@ public class StartMenu : MonoBehaviour, IDataPersistence
 
     public void mainMenu()
     {
-        SceneManager.LoadSceneAsync("Menu");
+        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 
     public void LoadData(SettingsData data)
@@ -119,5 +119,10 @@ public class StartMenu : MonoBehaviour, IDataPersistence
     {
         data.volume = this.volume.value;
         data.sensibility = this.sensibility.value;
+    }
+
+    private void OnDestroy()
+    {
+        menuAction.performed -= showStartMenu;
     }
 }

@@ -82,4 +82,10 @@ public class GameRules : MonoBehaviour
             gameWin = true;
         }
     }
+
+    private void OnDestroy()
+    {
+        GameScoreEvent.PlayerScored -= playerScored;
+        EnemyAttackEvent.GameOver -= gameOver;
+    }
 }

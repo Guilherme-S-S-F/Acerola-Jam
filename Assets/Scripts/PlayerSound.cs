@@ -32,4 +32,9 @@ public class PlayerSound : MonoBehaviour
 
         if (count > footstepClips.Length - 1) count = 0;
     }
+
+    private void OnDestroy()
+    {
+        Jam.Events.PlayerSoundEvent.onFootStep -= playFootstep;
+    }
 }

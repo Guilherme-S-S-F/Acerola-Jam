@@ -57,7 +57,6 @@ public class EnemyIAMonster : MonoBehaviour
 
     //Chasing
     Vector3 lastPlayerPos = Vector3.zero;
-
     private void Start()
     {
         player = GameObject.Find("Player").transform;
@@ -65,6 +64,12 @@ public class EnemyIAMonster : MonoBehaviour
         animator = GetComponent<Animator>();
 
         EnemyFocusEvent.EnemyFocus += beingFocused;
+        GameScoreEvent.PlayerScored += increaseDificult;
+
+        animator.SetBool("stunned", false);
+        stunned = false;
+        agent.isStopped = false;
+        stunnedTime = 0f;
     }
 
     private void Update()
@@ -84,6 +89,7 @@ public class EnemyIAMonster : MonoBehaviour
             playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
             if (!stunned && !gameRules.isPause)
             {
+                animator.SetBool("stunned", false);
                 if (!playerInSightRange && !playerInAttackRange) patrolling();
                 if (playerInSightRange && !playerInAttackRange) chasePlayer();
                 if (playerInSightRange && playerInAttackRange) attackPlayer();
@@ -104,7 +110,6 @@ public class EnemyIAMonster : MonoBehaviour
                     animator.SetFloat("running", 0f);
                 }
 
-
                 //Reset focusAmount if exited
                 if (!isBeingFocused && stunAmount > 0) stunAmount = 0;
 
@@ -117,13 +122,19 @@ public class EnemyIAMonster : MonoBehaviour
                 stunnedTime += Time.deltaTime;
                 if (stunnedTime > stunnedTimeLimit)
                 {
+                    animator.SetBool("stunned", false);
                     stunned = false;
                     agent.isStopped = false;
-                    stunnedTime = 0f;
-                    animator.SetBool("stunned", false);
+                    stunnedTime = 0f;                    
                 }
             }
 
+    }
+
+    void increaseDificult()
+    {
+        patrollingSpeed += 0.1f;
+        chasingSpeed += 0.1f;
     }
 
     private void patrolling()
@@ -144,13 +155,13 @@ public class EnemyIAMonster : MonoBehaviour
         Vector3 distanceToWalkPoint = transform.position - walkPoint;
 
         //Walkpoint reached
-        if (distanceToWalkPoint.magnitude < 1f)
+
+        if (distanceToWalkPoint.magnitude < 1.6f)
             walkPointSet = false;
 
         if (counterTNSP > timeToNextStaticPointLimit) changeStaticPointToGo(2);
 
         counterTNSP += Time.deltaTime;
-        Debug.Log("Point: "+counterTNSP);
     }
 
     private void changeStaticPointToGo(int maxRand)
@@ -171,17 +182,26 @@ public class EnemyIAMonster : MonoBehaviour
         float randomZ = Random.Range(-walkPointRange, walkPointRange);
         float randomX = Random.Range(-walkPointRange, walkPointRange);
 
-        walkPoint = new Vector3(transform.position.x + randomX, transform.position.y + 0.7f, transform.position.z + randomZ);
+        walkPoint = new Vector3(transform.position.x + randomX, transform.position.y + 0.8f, transform.position.z + randomZ);
         Debug.DrawRay(walkPoint, -transform.up);
         if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
             walkPointSet = true;
 
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log(other.tag);
+        if (other.tag == "Player")
+        {
+            attackPlayer();
+        }
+    }
+
     private void chasePlayer()
     {
         agent.SetDestination(player.position);
-        lastPlayerPos = player.position;
+        lastPlayerPos = player.position - new Vector3(player.position.x, player.position.y + 0.8f, player.position.z);
     }
 
     private void attackPlayer()
@@ -198,9 +218,6 @@ public class EnemyIAMonster : MonoBehaviour
             EnemyAttackEvent.InvokeGameOver();
             EnemyAttackEvent.InvokeEnemyAttack(monsterBody);
             float defaultx = transform.rotation.x;
-
-
-            this.transform.LookAt(player);
 
             alreadyAttacked = true;
             Invoke(nameof(resetAttack), timeBetweenAttacks);
@@ -228,5 +245,11 @@ public class EnemyIAMonster : MonoBehaviour
     private void exitFocus()
     {
         isBeingFocused = false;
+    }
+
+    private void OnDestroy()
+    {
+        EnemyFocusEvent.EnemyFocus -= beingFocused;
+        GameScoreEvent.PlayerScored -= increaseDificult;
     }
 }

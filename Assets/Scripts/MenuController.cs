@@ -29,7 +29,7 @@ public class MenuController : MonoBehaviour, IDataPersistence
 
     public void playGame()
     {
-        SceneManager.LoadSceneAsync("MainScene");
+        SceneManager.LoadSceneAsync("MainScene", LoadSceneMode.Single);
     }
 
     public void quitGame()
@@ -83,7 +83,8 @@ public class MenuController : MonoBehaviour, IDataPersistence
     {
         foreach(AudioSource audio in audios)
         {
-            audio.volume = volume.value;
+            audio.volume = volume.value - 0.5f;
+            audio.volume = Mathf.Clamp(audio.volume, 0.1f, 1f);
         }
     }
     public void save()

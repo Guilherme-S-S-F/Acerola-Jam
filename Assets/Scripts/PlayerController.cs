@@ -246,4 +246,10 @@ public class PlayerController : MonoBehaviour
         #endregion
         PlayerSoundEvent.InvokeFootStepEvent(Mathf.Abs(curSpeedX) + Mathf.Abs(curSpeedY), isRunning);
     }
+
+    private void OnDestroy()
+    {
+        flashlightAction.performed -= toggleFlashlight;
+        EnemyAttackEvent.EnemyAttack -= setAttacked;
+    }
 }
